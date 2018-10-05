@@ -1,7 +1,7 @@
 # Muchas gracias a Hilton Lipschitz por este makefile. Se ecuentra a
 # https://hiltmon.com/blog/2013/07/03/a-simple-c-plus-plus-project-structure/
 CC = g++
-CFLAGS = -std=c++11
+CFLAGS = -std=c++17
 
 SRCDIR   := src
 BUILDDIR := build
