@@ -82,7 +82,7 @@ found in `bin`.
 
 ## Authors
 
-* **Jackson Cole** - [jacksoncole.io](jacksoncole.io)
+* **Jackson Cole** - [jacksoncole.io](http://jacksoncole.io)
 
 ## License
 
