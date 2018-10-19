@@ -13,6 +13,7 @@ void PrintWeights(vDoub&);
 void PrintSection(string);
 void PrintNodes(vDoub&);
 double testODE(double, double);
+double AnalyticalSolution(double);
 
 int main() {
 	ButcherTableau bt {{   0.,   0.,   0.,   0.,   0.},
@@ -21,8 +22,15 @@ int main() {
 	                   {   1.,   0.,   0.,   1.,   0.},
 	                   {   0., 1/6., 1/3., 1/3., 1/6.}};
 
+	double lowerBound = 0;
+	double upperBound = 2;
+	double initialValue = 1;
+
 	RKIntegrator RK4;
-	RK4.RK(testODE, bt, 10000, 0, 2, 1);
+	RK4.RK(testODE, bt, 1000, lowerBound, upperBound, initialValue);
+
+	double soln = AnalyticalSolution(upperBound);
+	cout << "Analytical Solution: x = " << soln << endl;
 
 	ButcherTableau new_bt = RK4.getButcherTableau();
 	vDoub weights = RK4.getWeights();
@@ -35,9 +43,16 @@ int main() {
 
 } // end main
 
+
+double AnalyticalSolution(double t) {
+	return t + 1;
+} // end AnalyticalSolution
+
+
 double testODE(double t, double x) {
 	return x/(1 + t);
 } // end testODE
+
 
 void PrintTest(ButcherTableau bt, vec2D rkMat, vDoub weights, vDoub nodes) {
 	PrintSection("Butcher Tableau");
@@ -55,7 +70,8 @@ void PrintTest(ButcherTableau bt, vec2D rkMat, vDoub weights, vDoub nodes) {
 	PrintSection("Nodes");
 	PrintNodes(nodes);
 	cout << endl;
-}
+} // end PrintTest
+
 
 void PrintrkMat(vec2D& rkMat) {
 	int i, j;
@@ -69,6 +85,7 @@ void PrintrkMat(vec2D& rkMat) {
 		cout << endl;
 	}
 } // end PrintrkMat
+
 
 void PrintButcherTableau(ButcherTableau& bt) {
 	int i, j;
@@ -89,15 +106,18 @@ void PrintButcherTableau(ButcherTableau& bt) {
 	}
 } // end PrintButcherTableau
 
+
 void PrintNodes(vDoub& nodes) {
 	for (int i = 0; i < nodes.size(); i++)
 		cout << "c" << i + 1 << ": " << nodes[i] << endl;
 } // end PrintkWeights
 
+
 void PrintWeights(vDoub& weights) {
 	for (int i = 0; i < weights.size(); i++)
 		cout << "k" << i + 1 << ": " << weights[i] << endl;
 } // end PrintkWeights
+
 
 void PrintSection(string name) {
 	string DIVIDER = string(80, '*');

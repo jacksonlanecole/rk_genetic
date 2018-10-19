@@ -23,16 +23,30 @@ void RKIntegrator::RK(double (*f)(double, double), ButcherTableau& btToSet,
 	setrkMat();
 	setWeights();
 	initkVecTo0();
+	std::cout << "h = " << h << std::endl;
 
 	for (int i = 0; i < steps; i++) {
-		//if (i%100 == 0)
-		//	std::cout << t << std::endl;
-		x = step(f, h, t, x, kVec);
+		step(f, h, t, x, kVec);
 	}
 
 	std::cout << "t = " << t << "; x = " << x << std::endl;
 } // end RK
 /* ------------------------------------------------------------------------- */
+
+
+/* ------------------------------------------------------------------------- */
+// Butcher Tableau
+/* ------------------------------------------------------------------------- */
+void RKIntegrator::setButcherTableau(ButcherTableau& btToSet) {
+	bt.resize(btToSet.size());
+	bt = btToSet;
+} // end setButcherTableau
+
+ButcherTableau RKIntegrator::getButcherTableau() {
+	return bt;
+} // end getButcherTableau
+/* ------------------------------------------------------------------------- */
+
 
 /* ------------------------------------------------------------------------- */
 // Stages
@@ -45,6 +59,7 @@ int RKIntegrator::getStages() {
 	return stages;
 }
 /* ------------------------------------------------------------------------- */
+
 
 /* ------------------------------------------------------------------------- */
 // Step Coefficients
@@ -61,16 +76,13 @@ vDoub RKIntegrator::getNodes() {
 } // end getStepCoeff()
 /* ------------------------------------------------------------------------- */
 
+
 /* ------------------------------------------------------------------------- */
 // k Coefficients
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::setrkMat() {
-	rkMat.resize(stages);
-	for (int i = 0; i < stages; i++) {
-		for (int j = 1; j < stages; j++) {
-			rkMat[i] = std::vector<double>(bt[i].begin() + 1, bt[i].end());
-		}
-	}
+	for (int i = 0; i < stages; i++)
+		rkMat.push_back(std::vector<double>(bt[i].begin() + 1, bt[i].end()));
 } // end setStepCoeff
 
 
@@ -79,18 +91,6 @@ vec2D RKIntegrator::getrkMat() {
 } // end getrkMat()
 /* ------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------------- */
-// Butcher Tableau
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::setButcherTableau(ButcherTableau& btToSet) {
-	bt.resize(btToSet.size());
-	bt = btToSet;
-} // end setButcherTableau
-
-ButcherTableau RKIntegrator::getButcherTableau() {
-	return bt;
-} // end getButcherTableau
-/* ------------------------------------------------------------------------- */
 
 
 /* ------------------------------------------------------------------------- */
@@ -108,6 +108,7 @@ vDoub RKIntegrator::getWeights() {
 } // end getweights
 /* ------------------------------------------------------------------------- */
 
+
 /* ------------------------------------------------------------------------- */
 // Initializing ks as zero
 /* ------------------------------------------------------------------------- */
@@ -119,29 +120,31 @@ void RKIntegrator::initkVecTo0() {
 /* ------------------------------------------------------------------------- */
 
 
+/* ------------------------------------------------------------------------- */
+// Step
+/* ------------------------------------------------------------------------- */
 double RKIntegrator::step(
-	double (*f)(double, double), double h, double& t, double x, vDoub& kVec) {
-	double kSum = 0.;
+	double (*f)(double, double), double h, double& t, double& x, vDoub& kVec) {
+	double kSum;
 	double kFin = 0.;
 	initkVecTo0();
 
 	for (int i = 0; i < stages; i++) {
-		for (int j = 0; j < stages; j++)
-			kSum += kVec[j]*rkMat[i][j];
+		kSum = 0;
+		for (int j = 0; j <= i; j++) {
+			kSum += h*kVec[j]*rkMat[i][j];
+		}
+
 		kVec[i] = f(t + nodes[i]*h, x + kSum);
 	}
 
 	for (int i = 0; i < stages; i++) {
 		kFin += kVec[i] * weights[i];
 	}
-	x = x + h*(kFin);
 
-	//k1 = f(t, xi);
-	//k2 = f(t + h/2, xi + k1/2);
-	//k3 = f(t + h/2, xi + k2/2);
-	//k4 = f(t +   h, xi +   k3);
-	//x  = xi + h*(k1 + 2*k2 + 2*k3 + k4)/6;
+	x = x + h*(kFin);
 	t = t + h;
 
 	return x;
-}
+} // end RKIntegrator::step
+/* ------------------------------------------------------------------------- */
