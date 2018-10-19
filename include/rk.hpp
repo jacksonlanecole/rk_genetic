@@ -25,7 +25,7 @@ class RKIntegrator {
 
 		void RK(double (*f)(double, double), ButcherTableau&, double, double,
 				double, double);
-		double step(double (*)(double, double), double, double&, double, vDoub&);
+		double step(double (*)(double, double), double, double&, double&, vDoub&);
 
 		void setButcherTableau(ButcherTableau&);
 		ButcherTableau getButcherTableau();
