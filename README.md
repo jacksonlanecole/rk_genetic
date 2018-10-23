@@ -57,6 +57,7 @@ the Butcher Tableau describing an *s*-stage Runge-Kutta.
 
 ### Prerequisites
 ```
+cmake>=3.12.1
 python3.6
 deap==1.2.2
 ```
