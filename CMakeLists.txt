@@ -1,23 +1,23 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 3.12.1)
-SET (CMAKE_CXX_STANDARD 17)
-SET (CMAKE_BUILD_TYPE Release)
-PROJECT (rk_genetic)
+cmake_minimum_required(VERSION 3.12.1)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE Release)
+project(rkev)
 # --------------------------------------------------------------------------- #
-# MAKE CHANGES HERE (except for project specific information below)
+# MAKE CHANGES HERE(except for project specific information below)
 # --------------------------------------------------------------------------- #
-SET (SRCDIR
+set(SRCDIR
 	"src"
 	)
-SET (localPythonLibrary
+set(localPythonLibrary
 	"/usr/local/Cellar/python3/3.7.0/Frameworks/Python.framework/Versions/3.7/lib/libpython3.7m.dylib"
 	)
-SET (localPythonIncludeDir
-	"/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/include"
+set(localPythonIncludeDir
+	"/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/include/python3.7m"
 	)
-SET (boostRoot
+set(boostRoot
 	"/usr/local/Cellar/boost/1.67.0_1"
 	)
-SET (boostPython3Libs
+set(boostPython3Libs
 	"/usr/local/Cellar/boost-python3/1.67.0_1/lib"
 	)
 # --------------------------------------------------------------------------- #
@@ -33,50 +33,53 @@ include_directories(include)
 # --------------------------------------------------------------------------- #
 # Deals with actually creating the shared libraries rather than dylib on macOS
 # --------------------------------------------------------------------------- #
-IF (APPLE)
-	SET (CMAKE_SHARED_LIBRARY_SUFFIX ".so")
-ENDIF (APPLE)
+if(APPLE)
+	set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
+endif(APPLE)
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 # PYTHON STUFF
 # --------------------------------------------------------------------------- #
-SET (PYTHON_LIBRARY
+set(PYTHON_LIBRARY
 	${localPythonLibrary}
 	CACHE FILEPATH
 	"The path to Python libraries"
 	)
-SET (PYTHON_INCLUDE_DIR
+set(PYTHON_INCLUDE_DIR
 	${localPythonIncludeDir}
 	CACHE PATH
 	"Path to Python headers"
 	)
 
-FIND_PACKAGE (PythonInterp 3.6 REQUIRED)
-FIND_PACKAGE (PythonLibs 3.6 REQUIRED)
+find_package(PythonInterp 3.6 REQUIRED)
+find_package(PythonLibs 3.6 REQUIRED)
 
-IF(PYTHONLIBS_FOUND)
-	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-ELSE()
-	MESSAGE(FATAL_ERROR "Unable to find PythonLibs.")
-ENDIF()
+if(PYTHONLIBS_FOUND)
+	message(STATUS "Setting up Python Libraries")
+	message(STATUS "\tPython Includes : ${PYTHON_INCLUDE_DIRS}")
+	message(STATUS "\tPython Libraries: ${PYTHON_LIBRARIES}")
+	include_directories(${PYTHON_INCLUDE_DIRS})
+else()
+	message(FATAL_ERROR "Unable to find PythonLibs.")
+endif()
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
 # BOOST STUFF
 # --------------------------------------------------------------------------- #
-SET (BOOST_ROOT ${boostRoot})
-SET (BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
-SET (BOOST_LIBRARYDIR ${boostPython3Libs})
-SET (Boost_DEBUG                 OFF)
-SET (Boost_USE_STATIC_LIBS       OFF) # only find static libs
-SET (Boost_USE_MULTITHREADED      ON)
-SET (Boost_USE_STATIC_RUNTIME    OFF)
+set(BOOST_ROOT ${boostRoot})
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+set(BOOST_LIBRARYDIR ${boostPython3Libs})
+set(Boost_DEBUG                 OFF)
+set(Boost_USE_STATIC_LIBS       OFF) # only find static libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 
 find_package(Boost COMPONENTS python37 REQUIRED)
 message(STATUS "Setting up BOOST")
-message(STATUS "> Boost Includes : ${Boost_INCLUDE_DIRS}")
-message(STATUS "> Boost Libraries: ${Boost_LIBRARY_DIRS}")
+message(STATUS "\tBoost Includes : ${Boost_INCLUDE_DIRS}")
+message(STATUS "\tBoost Libraries: ${Boost_LIBRARY_DIRS}")
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 # --------------------------------------------------------------------------- #
@@ -85,23 +88,24 @@ link_directories(${Boost_LIBRARY_DIRS})
 # Linking everything
 # --------------------------------------------------------------------------- #
 add_library(
-	greet
+	rk
 	SHARED
-	${SRCDIR}/greet.cpp
+	${SRCDIR}/rk.cpp
 	)
 add_library(
-	greet_ext
+	rk_ext
 	SHARED
-	${SRCDIR}/greet_ext.cpp
+	src/rk_ext.cpp
+	${SRCDIR}/rk_ext.cpp
 	)
 target_link_libraries(
-	greet_ext
-	greet
+	rk_ext
+	rk
 	${Boost_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	)
 set_target_properties(
-	greet_ext
+	rk_ext
 	PROPERTIES
 	PREFIX
 	""
