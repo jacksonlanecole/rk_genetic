@@ -4,7 +4,7 @@
 BOOST_PYTHON_MODULE(rk_ext)
 {
 	using namespace boost::python;
-    class_<RKIntegrator>("RKIntegrator")
+	class_<RKIntegrator>("RKIntegrator")
         .def("RK", &RKIntegrator::RK)
     ;
 }
