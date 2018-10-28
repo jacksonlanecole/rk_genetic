@@ -1,4 +1,4 @@
-# rk_genetic
+# rkev
 
 When analyzing physical systems, there are often cases when analytical
 solutions to ordinary differential equations describing the systems
