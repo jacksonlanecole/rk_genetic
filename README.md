@@ -74,6 +74,10 @@ pip install -r requirements.txt
 The integrators can be built with `make`, and the compiled binaries will be
 found in `bin`.
 
+**NOTE:** At this point, the working build does essentially nothing useful, as
+it is just testing the RKIntegrator methods. The project can also be built using
+cmake in the `build` directory, but I would advise against it at this point.
+
 
 
 ## Built With
