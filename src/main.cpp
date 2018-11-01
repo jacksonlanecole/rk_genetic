@@ -1,3 +1,4 @@
+// main.cpp
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -6,9 +7,9 @@
 
 using namespace std;
 
-void PrintTest(ButcherTableau, vec2D, vDoub, vDoub);
+void PrintTest(vec2D, vec2D, vDoub, vDoub);
 void PrintrkMat(vec2D&);
-void PrintButcherTableau(ButcherTableau&);
+void PrintButcherTableau(vec2D&);
 void PrintWeights(vDoub&);
 void PrintSection(string);
 void PrintNodes(vDoub&);
@@ -16,7 +17,7 @@ double testODE(double, double);
 double AnalyticalSolution(double);
 
 int main() {
-	ButcherTableau bt {{   0.,   0.,   0.,   0.,   0.},
+	vec2D          bt {{   0.,   0.,   0.,   0.,   0.},
 	                   { 1/2., 1/2.,   0.,   0.,   0.},
 	                   { 1/2.,   0., 1/2.,   0.,   0.},
 	                   {   1.,   0.,   0.,   1.,   0.},
@@ -26,18 +27,20 @@ int main() {
 	double upperBound = 2;
 	double initialValue = 1;
 
-	RKIntegrator RK4;
-	RK4.RK(testODE, bt, 1000, lowerBound, upperBound, initialValue);
+	RKIntegrator RK4(testODE, bt, 1000, lowerBound, upperBound, initialValue);
 
 	double soln = AnalyticalSolution(upperBound);
 	cout << "Analytical Solution: x = " << soln << endl;
 
-	ButcherTableau new_bt = RK4.getButcherTableau();
-	vDoub weights = RK4.getWeights();
-	vec2D rkMat = RK4.getrkMat();
-	vDoub nodes = RK4.getNodes();
+	vec2D new_bt = RK4.bt.getTableau();
+	vDoub weights = RK4.bt.getWeights();
+	vec2D rkMat = RK4.bt.getrkMat();
+	vDoub nodes = RK4.bt.getNodes();
+	double result = RK4.run();
 
 	PrintTest(new_bt, rkMat, weights, nodes);
+
+	cout << "RESULT = " << result << endl;
 
 	return 0;
 
@@ -54,7 +57,7 @@ double testODE(double t, double x) {
 } // end testODE
 
 
-void PrintTest(ButcherTableau bt, vec2D rkMat, vDoub weights, vDoub nodes) {
+void PrintTest(vec2D bt, vec2D rkMat, vDoub weights, vDoub nodes) {
 	PrintSection("Butcher Tableau");
 	PrintButcherTableau(bt);
 	cout << endl;
@@ -87,7 +90,7 @@ void PrintrkMat(vec2D& rkMat) {
 } // end PrintrkMat
 
 
-void PrintButcherTableau(ButcherTableau& bt) {
+void PrintButcherTableau(vec2D& bt) {
 	int i, j;
 	int size = bt[0].size();
 	int width = 10;
