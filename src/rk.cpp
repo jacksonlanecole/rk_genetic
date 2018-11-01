@@ -1,111 +1,53 @@
+// rk.cpp
 #include "rk.hpp"
 
 /* ------------------------------------------------------------------------- */
 // Constructors, Destructors
 /* ------------------------------------------------------------------------- */
-RKIntegrator::RKIntegrator() {
-} // end default constructor
+RKIntegrator::RKIntegrator() {};
+
+RKIntegrator::RKIntegrator(double steps, double ti, double tf, double xi) {
+	/* This is a constructor purely for testing the boost module */
+	h = (tf - ti)/steps;
+	x = xi;
+	t = ti;
+	//bt.reset(btToSet);
+	//initkVecTo0();
+
+} // end constructor
+
+RKIntegrator::RKIntegrator(function_type f, vec2D& btToSet,
+		double _steps, double ti, double tf, double xi) {
+	h = (tf - ti)/_steps;
+	x = xi;
+	t = ti;
+	steps = _steps;
+	func = f;
+	bt.reset(btToSet);
+	initkVecTo0();
+
+} // end constructor
+
+RKIntegrator::RKIntegrator(const RKIntegrator& rkArg) :
+	h(rkArg.h), bt(rkArg.bt), t(rkArg.t), x(rkArg.x), stages(rkArg.stages),
+	steps(rkArg.steps), func(rkArg.func) {
+}
+
 RKIntegrator::~RKIntegrator() {
 } // end default destructor
 /* ------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------------------- */
-// Standard RK Routine
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::RK(double (*f)(double, double), ButcherTableau& btToSet,
-		double steps, double ti, double tf, double xi) {
-	double h   = (tf - ti)/steps;
-	double x = xi;
-	double t = ti;
-	setButcherTableau(btToSet);
-	setStages(bt.size() - 1);
-	setNodes();
-	setrkMat();
-	setWeights();
-	initkVecTo0();
-	std::cout << "h = " << h << std::endl;
-
-	for (int i = 0; i < steps; i++) {
-		step(f, h, t, x, kVec);
-	}
-
-	std::cout << "t = " << t << "; x = " << x << std::endl;
-} // end RK
-/* ------------------------------------------------------------------------- */
-
 
 /* ------------------------------------------------------------------------- */
-// Butcher Tableau
+// H
 /* ------------------------------------------------------------------------- */
-void RKIntegrator::setButcherTableau(ButcherTableau& btToSet) {
-	bt.resize(btToSet.size());
-	bt = btToSet;
-} // end setButcherTableau
-
-ButcherTableau RKIntegrator::getButcherTableau() {
-	return bt;
-} // end getButcherTableau
-/* ------------------------------------------------------------------------- */
-
-
-/* ------------------------------------------------------------------------- */
-// Stages
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::setStages(int s) {
-	stages = s;
+void RKIntegrator::setTimeStep(double timeStep) {
+	h = timeStep;
 } // end setStages
 
-int RKIntegrator::getStages() {
-	return stages;
+double RKIntegrator::getTimeStep() {
+	return h;
 }
-/* ------------------------------------------------------------------------- */
-
-
-/* ------------------------------------------------------------------------- */
-// Step Coefficients
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::setNodes() {
-	nodes.resize(stages);
-	for (int i=0; i < stages; i++) {
-		nodes[i] = bt[i][0];
-	}
-} // end setStepCoeff
-
-vDoub RKIntegrator::getNodes() {
-	return nodes;
-} // end getStepCoeff()
-/* ------------------------------------------------------------------------- */
-
-
-/* ------------------------------------------------------------------------- */
-// k Coefficients
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::setrkMat() {
-	for (int i = 0; i < stages; i++)
-		rkMat.push_back(std::vector<double>(bt[i].begin() + 1, bt[i].end()));
-} // end setStepCoeff
-
-
-vec2D RKIntegrator::getrkMat() {
-	return rkMat;
-} // end getrkMat()
-/* ------------------------------------------------------------------------- */
-
-
-
-/* ------------------------------------------------------------------------- */
-// Weights
-/* ------------------------------------------------------------------------- */
-void RKIntegrator::setWeights() {
-	for (int i = 1; i <= stages; i++) {
-		weights.push_back(bt.back()[i]);
-	}
-} // end setweights
-
-
-vDoub RKIntegrator::getWeights() {
-	return weights;
-} // end getweights
 /* ------------------------------------------------------------------------- */
 
 
@@ -113,6 +55,7 @@ vDoub RKIntegrator::getWeights() {
 // Initializing ks as zero
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::initkVecTo0() {
+	stages = bt.getStages();
 	kVec.resize(stages);
 	for (int i = 0; i < stages; i++)
 		kVec[i] = 0.;
@@ -123,10 +66,14 @@ void RKIntegrator::initkVecTo0() {
 /* ------------------------------------------------------------------------- */
 // Step
 /* ------------------------------------------------------------------------- */
-double RKIntegrator::step(
-	double (*f)(double, double), double h, double& t, double& x, vDoub& kVec) {
+double RKIntegrator::step(double& t, double& x) {
 	double kSum;
 	double kFin = 0.;
+	int stages = bt.getStages();
+	vDoub nodes = bt.getNodes();
+	vec2D rkMat = bt.getrkMat();
+	vDoub weights = bt.getWeights();
+
 	initkVecTo0();
 
 	for (int i = 0; i < stages; i++) {
@@ -135,16 +82,30 @@ double RKIntegrator::step(
 			kSum += h*kVec[j]*rkMat[i][j];
 		}
 
-		kVec[i] = f(t + nodes[i]*h, x + kSum);
+		kVec[i] = func(t + nodes[i]*h, x + kSum);
 	}
 
 	for (int i = 0; i < stages; i++) {
 		kFin += kVec[i] * weights[i];
 	}
+	dxVec.push_back(kFin);
 
 	x = x + h*(kFin);
 	t = t + h;
 
 	return x;
 } // end RKIntegrator::step
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+// Run
+/* ------------------------------------------------------------------------- */
+double RKIntegrator::run() {
+	for (int i = 0; i < steps; i++) {
+		xVec.push_back(x);
+		tVec.push_back(t);
+		x = step(t, x);
+	}
+	return x;
+}
 /* ------------------------------------------------------------------------- */

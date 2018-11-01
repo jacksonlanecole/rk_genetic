@@ -1,46 +1,65 @@
+// rk.hpp
 #ifndef RK_H_
 #define RK_H_
+/* ------------------------------------------------------------------------- */
+// Includes
+/* ------------------------------------------------------------------------- */
 #include <vector>
-#include <iostream> //DELETE
+#include "tableau.hpp"
+/* ------------------------------------------------------------------------- */
 
-typedef std::vector< std::vector<double> > ButcherTableau;
+/* ------------------------------------------------------------------------- */
+// Type Definitions
+/* ------------------------------------------------------------------------- */
 typedef std::vector<double> vDoub;
 typedef std::vector< std::vector<double> > vec2D;
-//typedef std::vector<double> kVec;
+typedef double (*function_type)(double, double);
+/* ------------------------------------------------------------------------- */
+
 
 class RKIntegrator {
 	private:
 		double t;
+		double h;
+		double x;
 		int stages;
 		int steps;
-		ButcherTableau bt;
-		vDoub weights;
-		vec2D rkMat;
-		vDoub nodes;
 		vDoub kVec;
+		function_type func;
+
+		vDoub xVec;
+		vDoub dxVec;
+		vDoub tVec;
+
 
 	public:
+		Tableau bt;
+		/* ----------------------------------------------------------------- */
+		// Constructors
+		/* ----------------------------------------------------------------- */
 		RKIntegrator();
-		~RKIntegrator();
-
-		void RK(double (*f)(double, double), ButcherTableau&, double, double,
+		RKIntegrator(double, double, double, double);// test constructor
+		RKIntegrator(
+				function_type func, vec2D&, double, double,
 				double, double);
-		double step(double (*)(double, double), double, double&, double&, vDoub&);
+		//RKIntegrator(
+		//		double (*f)(double, double), ButcherTableau&, double, double,
+		//		double, double);
+		RKIntegrator(const RKIntegrator& rkArg);
+		~RKIntegrator();
+		/* ----------------------------------------------------------------- */
+		/*
+		void RK(double (*f)(double, double), ButcherTableau&, double, double,
+			double, double);
+		*/
 
-		void setButcherTableau(ButcherTableau&);
-		ButcherTableau getButcherTableau();
+		double step(double&, double&);
+		double run();
 
-		void setStages(int);
-		int getStages();
 
-		void setNodes();
-		vDoub getNodes();
+		void setTimeStep(double);
+		double getTimeStep();
 
-		void setrkMat();
-		vec2D getrkMat();
-
-		void setWeights();
-		vDoub getWeights();
 
 		void initkVecTo0();
 
