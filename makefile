@@ -8,7 +8,8 @@ BUILDDIR := build
 TARGET   := bin/main
 
 SRCEXT   := cpp
-SOURCES  := $(shell find $(SRCDIR) -type f -name \*.$(SRCEXT))
+#SOURCES  := $(shell find $(SRCDIR) -type f -name \*.$(SRCEXT))
+SOURCES  := $(shell find $(SRCDIR) -type f -name \*.$(SRCEXT) ! -name *ext*.cpp)
 OBJECTS  := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 INC      := -I include
 
