@@ -52,8 +52,8 @@ set(PYTHON_INCLUDE_DIR
 	"Path to Python headers"
 	)
 
-find_package(PythonInterp 3.6 REQUIRED)
-find_package(PythonLibs 3.6 REQUIRED)
+find_package(PythonInterp 3.7 REQUIRED)
+find_package(PythonLibs 3.7 REQUIRED)
 
 if(PYTHONLIBS_FOUND)
 	message(STATUS "Setting up Python Libraries")
@@ -91,11 +91,11 @@ add_library(
 	rk
 	SHARED
 	${SRCDIR}/rk.cpp
+	${SRCDIR}/tableau.cpp
 	)
 add_library(
 	rk_ext
 	SHARED
-	src/rk_ext.cpp
 	${SRCDIR}/rk_ext.cpp
 	)
 target_link_libraries(
