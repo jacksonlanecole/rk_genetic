@@ -5,21 +5,7 @@ project(rkev)
 # --------------------------------------------------------------------------- #
 # MAKE CHANGES HERE(except for project specific information below)
 # --------------------------------------------------------------------------- #
-set(SRCDIR
-	"src"
-	)
-set(localPythonLibrary
-	"/usr/local/Cellar/python3/3.7.0/Frameworks/Python.framework/Versions/3.7/lib/libpython3.7m.dylib"
-	)
-set(localPythonIncludeDir
-	"/usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/include/python3.7m"
-	)
-set(boostRoot
-	"/usr/local/Cellar/boost/1.67.0_1"
-	)
-set(boostPython3Libs
-	"/usr/local/Cellar/boost-python3/1.67.0_1/lib"
-	)
+set(SRCDIR "src")
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
@@ -27,7 +13,6 @@ set(boostPython3Libs
 # bring project headers into the project
 # --------------------------------------------------------------------------- #
 include_directories(include)
-#file(GLOB SOURCES "src/*.cpp")
 # --------------------------------------------------------------------------- #
 
 # --------------------------------------------------------------------------- #
@@ -41,17 +26,6 @@ endif(APPLE)
 # --------------------------------------------------------------------------- #
 # PYTHON STUFF
 # --------------------------------------------------------------------------- #
-set(PYTHON_LIBRARY
-	${localPythonLibrary}
-	CACHE FILEPATH
-	"The path to Python libraries"
-	)
-set(PYTHON_INCLUDE_DIR
-	${localPythonIncludeDir}
-	CACHE PATH
-	"Path to Python headers"
-	)
-
 find_package(PythonInterp 3.7 REQUIRED)
 find_package(PythonLibs 3.7 REQUIRED)
 
@@ -68,15 +42,12 @@ endif()
 # --------------------------------------------------------------------------- #
 # BOOST STUFF
 # --------------------------------------------------------------------------- #
-set(BOOST_ROOT ${boostRoot})
-set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
-set(BOOST_LIBRARYDIR ${boostPython3Libs})
 set(Boost_DEBUG                 OFF)
 set(Boost_USE_STATIC_LIBS       OFF) # only find static libs
-set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_MULTITHREADED     OFF)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
-find_package(Boost COMPONENTS python37 REQUIRED)
+find_package(Boost 1.67 COMPONENTS python37 REQUIRED)
 message(STATUS "Setting up BOOST")
 message(STATUS "\tBoost Includes : ${Boost_INCLUDE_DIRS}")
 message(STATUS "\tBoost Libraries: ${Boost_LIBRARY_DIRS}")
@@ -88,22 +59,44 @@ link_directories(${Boost_LIBRARY_DIRS})
 # Linking everything
 # --------------------------------------------------------------------------- #
 add_library(
+	tableau
+	SHARED
+	${SRCDIR}/tableau.cpp
+	)
+
+add_library(
 	rk
 	SHARED
 	${SRCDIR}/rk.cpp
-	${SRCDIR}/tableau.cpp
 	)
+
 add_library(
 	rk_ext
 	SHARED
 	${SRCDIR}/rk_ext.cpp
 	)
+
 target_link_libraries(
-	rk_ext
-	rk
+	tableau
 	${Boost_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	)
+
+target_link_libraries(
+	rk
+	tableau
+	${PYTHON_LIBRARIES}
+	${Boost_LIBRARIES}
+	)
+
+target_link_libraries(
+	rk_ext
+	rk
+	tableau
+	${PYTHON_LIBRARIES}
+	${Boost_LIBRARIES}
+	)
+
 set_target_properties(
 	rk_ext
 	PROPERTIES
