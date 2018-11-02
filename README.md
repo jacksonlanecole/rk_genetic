@@ -66,18 +66,16 @@ deap==1.2.2
 Setting up the Python virtual environment and activating the virtual environment
 can be done by typing
 ```
-virtualenv env
+virtualenv env /path/to/python3 ./env
 source env/bin/activate
 pip install -r requirements.txt
 ```
 
-The integrators can be built with `make`, and the compiled binaries will be
-found in `bin`.
-
-**NOTE:** At this point, the working build does essentially nothing useful, as
-it is just testing the RKIntegrator methods. The project can also be built using
-cmake in the `build` directory, but I would advise against it at this point.
-
+It should be noted that the intention is that this project will be built using
+cmake. For this reason, disregard the makefile present in the repo root and
+simply type `sh build.sh`. This will generate the shared libraries in the build
+repository (with plans to move these to lib?) which can then be called from
+Python.
 
 
 ## Built With
