@@ -1,22 +1,35 @@
 // rk.cpp
 #include "rk.hpp"
+namespace py = boost::python;
 
 /* ------------------------------------------------------------------------- */
 // Constructors, Destructors
 /* ------------------------------------------------------------------------- */
 RKIntegrator::RKIntegrator() {};
 
-RKIntegrator::RKIntegrator(double steps, double ti, double tf, double xi) {
+RKIntegrator::RKIntegrator(py::list& btToSet, double steps, double ti, double tf, double xi) {
 	/* This is a constructor purely for testing the boost module */
 	h = (tf - ti)/steps;
 	x = xi;
 	t = ti;
-	//bt.reset(btToSet);
+	bt.reset(btToSet);
 	//initkVecTo0();
 
 } // end constructor
 
 RKIntegrator::RKIntegrator(function_type f, vec2D& btToSet,
+		double _steps, double ti, double tf, double xi) {
+	h = (tf - ti)/_steps;
+	x = xi;
+	t = ti;
+	steps = _steps;
+	func = f;
+	bt.reset(btToSet);
+	initkVecTo0();
+
+} // end constructor
+
+RKIntegrator::RKIntegrator(function_type f, py::list& btToSet,
 		double _steps, double ti, double tf, double xi) {
 	h = (tf - ti)/_steps;
 	x = xi;

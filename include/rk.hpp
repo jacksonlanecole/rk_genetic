@@ -5,8 +5,11 @@
 // Includes
 /* ------------------------------------------------------------------------- */
 #include <vector>
+#include <boost/python.hpp>
 #include "tableau.hpp"
 /* ------------------------------------------------------------------------- */
+
+namespace py = boost::python;
 
 /* ------------------------------------------------------------------------- */
 // Type Definitions
@@ -38,9 +41,12 @@ class RKIntegrator {
 		// Constructors
 		/* ----------------------------------------------------------------- */
 		RKIntegrator();
-		RKIntegrator(double, double, double, double);// test constructor
+		RKIntegrator(py::list&, double, double, double, double);// test constructor
 		RKIntegrator(
 				function_type func, vec2D&, double, double,
+				double, double);
+		RKIntegrator(
+				function_type func, py::list&, double, double,
 				double, double);
 		//RKIntegrator(
 		//		double (*f)(double, double), ButcherTableau&, double, double,

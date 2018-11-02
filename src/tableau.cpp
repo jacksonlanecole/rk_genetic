@@ -1,13 +1,24 @@
 // tableau.cpp
 #include "tableau.hpp"
+#include <boost/python.hpp>
+
+namespace py = boost::python;
 
 /* ------------------------------------------------------------------------- */
 // Constructors, destructors
 /* ------------------------------------------------------------------------- */
 Tableau::Tableau() {}; // default constructor
 
-Tableau::Tableau(vec2D& tableau) {
-	setTableau(tableau);
+Tableau::Tableau(vec2D& tableauArg) {
+	setTableau(tableauArg);
+	setStages();
+	setNodes();
+	setrkMat();
+	setWeights();
+} // end constructor taking a 2D vector tableau
+
+Tableau::Tableau(py::list& tableauArg) {
+	setTableau(tableauArg);
 	setStages();
 	setNodes();
 	setrkMat();
@@ -21,8 +32,16 @@ Tableau::Tableau(const Tableau& tableauArg) :
 
 Tableau::~Tableau() {};
 
-void Tableau::reset(vec2D& tableau) {
-	setTableau(tableau);
+void Tableau::reset(vec2D& tableauArg) {
+	setTableau(tableauArg);
+	setStages();
+	setNodes();
+	setrkMat();
+	setWeights();
+} // end reset
+
+void Tableau::reset(py::list& tableauArg) {
+	setTableau(tableauArg);
 	setStages();
 	setNodes();
 	setrkMat();
@@ -37,6 +56,16 @@ void Tableau::reset(vec2D& tableau) {
 void Tableau::setTableau(vec2D& btToSet) {
 	tableau.resize(btToSet.size());
 	tableau = btToSet;
+} // end setTableau
+
+void Tableau::setTableau(py::list& _tableau) {
+	int listLen = py::len(_tableau);
+	tableau.resize(listLen);
+	for (int i = 0; i < listLen; i++) {
+		for (int j = 0; j < listLen; j++) {
+			tableau[i].push_back(py::extract<double>(_tableau[i][j]));
+		}
+	}
 } // end setTableau
 
 vec2D Tableau::getTableau() {
