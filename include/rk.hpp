@@ -16,7 +16,6 @@ namespace py = boost::python;
 /* ------------------------------------------------------------------------- */
 typedef std::vector<double> vDoub;
 typedef std::vector< std::vector<double> > vec2D;
-typedef double (*function_type)(double, double);
 /* ------------------------------------------------------------------------- */
 
 
@@ -28,7 +27,7 @@ class RKIntegrator {
 		int stages;
 		int steps;
 		vDoub kVec;
-		function_type func;
+		py::object func;
 
 		vDoub xVec;
 		vDoub dxVec;
@@ -41,16 +40,9 @@ class RKIntegrator {
 		// Constructors
 		/* ----------------------------------------------------------------- */
 		RKIntegrator();
-		RKIntegrator(py::list&, double, double, double, double);// test constructor
 		RKIntegrator(
-				function_type func, vec2D&, double, double,
+				py::object&, py::list&, double, double,
 				double, double);
-		RKIntegrator(
-				function_type func, py::list&, double, double,
-				double, double);
-		//RKIntegrator(
-		//		double (*f)(double, double), ButcherTableau&, double, double,
-		//		double, double);
 		RKIntegrator(const RKIntegrator& rkArg);
 		~RKIntegrator();
 		/* ----------------------------------------------------------------- */
@@ -58,6 +50,7 @@ class RKIntegrator {
 		void RK(double (*f)(double, double), ButcherTableau&, double, double,
 			double, double);
 		*/
+
 
 		double step(double&, double&);
 		double run();

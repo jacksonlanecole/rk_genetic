@@ -1,5 +1,6 @@
 // rk.cpp
 #include "rk.hpp"
+#include <iostream>
 namespace py = boost::python;
 
 /* ------------------------------------------------------------------------- */
@@ -7,29 +8,7 @@ namespace py = boost::python;
 /* ------------------------------------------------------------------------- */
 RKIntegrator::RKIntegrator() {};
 
-RKIntegrator::RKIntegrator(py::list& btToSet, double steps, double ti, double tf, double xi) {
-	/* This is a constructor purely for testing the boost module */
-	h = (tf - ti)/steps;
-	x = xi;
-	t = ti;
-	bt.reset(btToSet);
-	//initkVecTo0();
-
-} // end constructor
-
-RKIntegrator::RKIntegrator(function_type f, vec2D& btToSet,
-		double _steps, double ti, double tf, double xi) {
-	h = (tf - ti)/_steps;
-	x = xi;
-	t = ti;
-	steps = _steps;
-	func = f;
-	bt.reset(btToSet);
-	initkVecTo0();
-
-} // end constructor
-
-RKIntegrator::RKIntegrator(function_type f, py::list& btToSet,
+RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
 		double _steps, double ti, double tf, double xi) {
 	h = (tf - ti)/_steps;
 	x = xi;
@@ -95,7 +74,7 @@ double RKIntegrator::step(double& t, double& x) {
 			kSum += h*kVec[j]*rkMat[i][j];
 		}
 
-		kVec[i] = func(t + nodes[i]*h, x + kSum);
+		kVec[i] = py::extract<double>(func(t + nodes[i]*h, x + kSum));
 	}
 
 	for (int i = 0; i < stages; i++) {
@@ -119,6 +98,7 @@ double RKIntegrator::run() {
 		tVec.push_back(t);
 		x = step(t, x);
 	}
+	std::cout << "RESULT = " << x << std::endl;
 	return x;
 }
 /* ------------------------------------------------------------------------- */
