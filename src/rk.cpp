@@ -9,11 +9,13 @@ namespace py = boost::python;
 RKIntegrator::RKIntegrator() {};
 
 RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
-		double _steps, double ti, double tf, double xi) {
-	h = (tf - ti)/_steps;
+		double _steps, double ti, double _tf, double xi) {
+	h = (_tf - ti)/_steps;
 	x = xi;
 	t = ti;
+	tf = _tf;
 	steps = _steps;
+	finished = false;
 	func = f;
 	bt.reset(btToSet);
 	initkVecTo0();
@@ -58,6 +60,10 @@ void RKIntegrator::initkVecTo0() {
 /* ------------------------------------------------------------------------- */
 // Step
 /* ------------------------------------------------------------------------- */
+void RKIntegrator::stepper() {
+	x = step(t, x);
+}
+
 double RKIntegrator::step(double& t, double& x) {
 	double kSum;
 	double kFin = 0.;
@@ -65,6 +71,9 @@ double RKIntegrator::step(double& t, double& x) {
 	vDoub nodes = bt.getNodes();
 	vec2D rkMat = bt.getrkMat();
 	vDoub weights = bt.getWeights();
+
+	xVec.push_back(x);
+	tVec.push_back(t);
 
 	initkVecTo0();
 
@@ -84,9 +93,19 @@ double RKIntegrator::step(double& t, double& x) {
 
 	x = x + h*(kFin);
 	t = t + h;
+	if (t >= tf)
+		finished = true;
 
 	return x;
 } // end RKIntegrator::step
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+// isFinished
+/* ------------------------------------------------------------------------- */
+bool RKIntegrator::isFinished() {
+	return finished;
+}
 /* ------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------------- */
@@ -100,5 +119,23 @@ double RKIntegrator::run() {
 	}
 	std::cout << "RESULT = " << x << std::endl;
 	return x;
+}
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+// get_vecs
+/* ------------------------------------------------------------------------- */
+std::vector< double > RKIntegrator::get_xVec() {
+	return xVec;
+}
+
+std::vector< double > RKIntegrator::get_dxVec() {
+//vDoub RKIntegrator::get_dxVec() {
+	return dxVec;
+}
+
+//vDoub RKIntegrator::get_tVec() {
+std::vector< double > RKIntegrator::get_tVec() {
+	return tVec;
 }
 /* ------------------------------------------------------------------------- */

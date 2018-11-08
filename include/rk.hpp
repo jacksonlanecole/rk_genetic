@@ -22,16 +22,18 @@ typedef std::vector< std::vector<double> > vec2D;
 class RKIntegrator {
 	private:
 		double t;
+		double tf;
 		double h;
 		double x;
 		int stages;
 		int steps;
-		vDoub kVec;
+		bool finished;
+		std::vector< double > kVec;
 		py::object func;
 
-		vDoub xVec;
-		vDoub dxVec;
-		vDoub tVec;
+		std::vector< double > xVec;
+		std::vector< double > dxVec;
+		std::vector< double > tVec;
 
 
 	public:
@@ -52,16 +54,26 @@ class RKIntegrator {
 		*/
 
 
+		void stepper();
 		double step(double&, double&);
 		double run();
+		bool isFinished();
 
 
 		void setTimeStep(double);
 		double getTimeStep();
 
 
+
 		void initkVecTo0();
 
+
+		//vDoub get_xVec();
+		//vDoub get_dxVec();
+		//vDoub get_tVec();
+		std::vector< double > get_xVec();
+		std::vector< double > get_dxVec();
+		std::vector< double > get_tVec();
 
 };
 
