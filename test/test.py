@@ -11,8 +11,13 @@ def main():
     upperBound = 2
     initialValue = 1
 
-    RK4 = rk_ext.RKIntegrator(func, bt, 1000, lowerBound, upperBound, initialValue)
-    RK4.run()
+    RK4 = rk_ext.RKIntegrator(func, bt, 10000, lowerBound, upperBound, initialValue)
+    while (not RK4.isFinished()):
+        RK4.step()
+
+    xVec = RK4.get_xVec()
+    dxVec = RK4.get_dxVec()
+    tVec = RK4.get_tVec()
 
 
 def func(t, x):
