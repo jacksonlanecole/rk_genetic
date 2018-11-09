@@ -11,16 +11,26 @@ def main():
     upperBound = 2
     initialValue = 1
 
-    RK4 = rk_ext.RKIntegrator(func, bt, 10000, lowerBound, upperBound, initialValue)
-    while (not RK4.isFinished()):
-        RK4.step()
+    RK4_1D = rk_ext.RKIntegrator(func, bt, 10000, lowerBound, upperBound, initialValue)
+    #while (not RK4_1D.isFinished()):
+    #    RK4_1D.step()
 
-    xVec = RK4.get_xVec()
-    dxVec = RK4.get_dxVec()
-    tVec = RK4.get_tVec()
+    xVec =  RK4_1D.get_xVec()
+    dxVec = RK4_1D.get_dxVec()
+    tVec =  RK4_1D.get_tVec()
 
-    print(RK4.get_last(2))
+    #print(RK4_1D.get_last(2))
 
+    lowerBound = 0.
+    upperBound = 2.
+    initialValue = [1., 1., 1., 1., 1.]
+    RK4_2D = rk_ext.RKIntegrator(func, bt, 10000., lowerBound, upperBound)
+    x = initialValue
+
+    while (not RK4_2D.isFinished()):
+        x = RK4_2D.step(x)
+
+    print(x)
 
 def func(t, x):
     return x/(1 + t)
