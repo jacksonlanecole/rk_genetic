@@ -19,6 +19,8 @@ def main():
     dxVec = RK4.get_dxVec()
     tVec = RK4.get_tVec()
 
+    print(RK4.get_last(2))
+
 
 def func(t, x):
     return x/(1 + t)
