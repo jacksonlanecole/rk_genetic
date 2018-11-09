@@ -60,9 +60,15 @@ void RKIntegrator::initkVecTo0() {
 /* ------------------------------------------------------------------------- */
 // Step
 /* ------------------------------------------------------------------------- */
-void RKIntegrator::stepper() {
+void RKIntegrator::stepWrap() {
 	x = step(t, x);
 }
+
+
+void RKIntegrator::stepAugWrap(double x) {
+	x = step(t, x);
+}
+
 
 double RKIntegrator::step(double& t, double& x) {
 	double kSum;
@@ -122,6 +128,7 @@ double RKIntegrator::run() {
 }
 /* ------------------------------------------------------------------------- */
 
+
 /* ------------------------------------------------------------------------- */
 // get_vecs
 /* ------------------------------------------------------------------------- */
@@ -137,5 +144,23 @@ std::vector< double > RKIntegrator::get_dxVec() {
 //vDoub RKIntegrator::get_tVec() {
 std::vector< double > RKIntegrator::get_tVec() {
 	return tVec;
+}
+/* ------------------------------------------------------------------------- */
+
+
+/* ------------------------------------------------------------------------- */
+// Get lasts
+/* ------------------------------------------------------------------------- */
+double RKIntegrator::get_last(int choice) {
+	switch (choice) {
+		case 0 :
+			return xVec.back();
+		case 1 :
+			return dxVec.back();
+		case 2 :
+			return tVec.back();
+		default:
+			throw;
+	}
 }
 /* ------------------------------------------------------------------------- */

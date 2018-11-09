@@ -54,7 +54,8 @@ class RKIntegrator {
 		*/
 
 
-		void stepper();
+		void stepAugWrap(double x);
+		void stepWrap();
 		double step(double&, double&);
 		double run();
 		bool isFinished();
@@ -74,6 +75,8 @@ class RKIntegrator {
 		std::vector< double > get_xVec();
 		std::vector< double > get_dxVec();
 		std::vector< double > get_tVec();
+
+		double get_last(int);
 
 };
 

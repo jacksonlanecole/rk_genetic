@@ -10,11 +10,13 @@ BOOST_PYTHON_MODULE(rk_ext)
 
 	class_<RKIntegrator>("RKIntegrator")
 		.def(init<object&, list&, double, double, double, double>())
-		.def("step", &RKIntegrator::stepper)
+		.def("step", &RKIntegrator::stepWrap)
+		.def("step", &RKIntegrator::stepAugWrap)
 		.def("run", &RKIntegrator::run)
 		.def("isFinished", &RKIntegrator::isFinished)
 		.def("get_xVec", &RKIntegrator::get_xVec)
 		.def("get_dxVec", &RKIntegrator::get_dxVec)
 		.def("get_tVec", &RKIntegrator::get_tVec)
+		.def("get_last", &RKIntegrator::get_last)
 		;
 }
