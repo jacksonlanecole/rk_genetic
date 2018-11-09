@@ -10,39 +10,39 @@ namespace py = boost::python;
 RKIntegrator::RKIntegrator() {};
 
 RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
-		double _steps, double ti, double _tf, double xi) {
-	h = (_tf - ti)/_steps;
-	x = xi;
-	t = ti;
-	tf = _tf;
-	steps = _steps;
-	finished = false;
-	func = f;
-	bt.reset(btToSet);
+		double steps, double ti, double tf, double xi) {
+	h_ = (tf - ti)/steps;
+	x_ = xi;
+	t_ = ti;
+	tf_ = tf;
+	steps_ = steps;
+	finished_ = false;
+	func_ = f;
+	bt_.reset(btToSet);
 	initkVecTo0();
 
-	usingVector = false;
+	usingVector_ = false;
 
 } // end constructor
 
 RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
-		double _steps, double ti, double _tf) {
-	h = (_tf - ti)/_steps;
-	t = ti;
-	tf = _tf;
-	steps = _steps;
-	finished = false;
-	func = f;
-	bt.reset(btToSet);
+		double steps, double ti, double tf) {
+	h_ = (tf - ti)/steps;
+	t_ = ti;
+	tf_ = tf;
+	steps_ = steps;
+	finished_ = false;
+	func_ = f;
+	bt_.reset(btToSet);
 	initkVecTo0();
 
-	usingVector = true;
+	usingVector_ = true;
 
 } // end constructor
 
 RKIntegrator::RKIntegrator(const RKIntegrator& rkArg) :
-	h(rkArg.h), bt(rkArg.bt), t(rkArg.t), x(rkArg.x), stages(rkArg.stages),
-	steps(rkArg.steps), func(rkArg.func) {
+	h_(rkArg.h_), bt_(rkArg.bt_), t_(rkArg.t_), x_(rkArg.x_), stages_(rkArg.stages_),
+	steps_(rkArg.steps_), func_(rkArg.func_) {
 }
 
 RKIntegrator::~RKIntegrator() {
@@ -54,11 +54,11 @@ RKIntegrator::~RKIntegrator() {
 // H
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::setTimeStep(double timeStep) {
-	h = timeStep;
+	h_ = timeStep;
 } // end setStages
 
 double RKIntegrator::getTimeStep() {
-	return h;
+	return h_;
 }
 /* ------------------------------------------------------------------------- */
 
@@ -67,10 +67,10 @@ double RKIntegrator::getTimeStep() {
 // Initializing ks as zero
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::initkVecTo0() {
-	stages = bt.getStages();
-	kVec.resize(stages);
-	for (int i = 0; i < stages; i++)
-		kVec[i] = 0.;
+	stages_ = bt_.getStages();
+	kVec_.resize(stages_);
+	for (int i = 0; i < stages_; i++)
+		kVec_[i] = 0.;
 } // end initKsTo0
 /* ------------------------------------------------------------------------- */
 
@@ -79,12 +79,12 @@ void RKIntegrator::initkVecTo0() {
 // Step
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::stepWrap() {
-	x = step(x);
+	x_ = step(x_);
 }
 
 
 void RKIntegrator::stepAugWrap(double x) {
-	x = step(x);
+	x_ = step(x);
 }
 
 //void RKIntegrator::stepAugWrap(py::list& xList) {
@@ -95,34 +95,34 @@ void RKIntegrator::stepAugWrap(double x) {
 double RKIntegrator::step(double xVal) {
 	double kSum;
 	double kFin = 0.;
-	int stages = bt.getStages();
-	vDoub nodes = bt.getNodes();
-	vec2D rkMat = bt.getrkMat();
-	vDoub weights = bt.getWeights();
+	//int stages_ = bt_.getStages();
+	vDoub nodes = bt_.getNodes();
+	vec2D rkMat = bt_.getrkMat();
+	vDoub weights = bt_.getWeights();
 
-	xVec.push_back(xVal);
-	tVec.push_back(t);
+	xVec_.push_back(xVal);
+	tVec_.push_back(t_);
 
 	initkVecTo0();
 
-	for (int i = 0; i < stages; i++) {
+	for (int i = 0; i < stages_; i++) {
 		kSum = 0;
 		for (int j = 0; j <= i; j++) {
-			kSum += h*kVec[j]*rkMat[i][j];
+			kSum += h_*kVec_[j]*rkMat[i][j];
 		}
 
-		kVec[i] = py::extract<double>(func(t + nodes[i]*h, xVal + kSum));
+		kVec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
 	}
 
-	for (int i = 0; i < stages; i++) {
-		kFin += kVec[i] * weights[i];
+	for (int i = 0; i < stages_; i++) {
+		kFin += kVec_[i] * weights[i];
 	}
-	dxVec.push_back(kFin);
+	dxVec_.push_back(kFin);
 
-	xVal = xVal + h*(kFin);
-	t = t + h;
-	if (t >= tf)
-		finished = true;
+	xVal = xVal + h_*(kFin);
+	t_ = t_ + h_;
+	if (t_ >= tf_)
+		finished_ = true;
 
 	return xVal;
 } // end RKIntegrator::step
@@ -131,19 +131,19 @@ double RKIntegrator::step(double xVal) {
 py::list RKIntegrator::vecStep(py::list& pyxVec) {
 	double kSum;
 	double kFin = 0.;
-	int stages = bt.getStages();
-	std::vector< double > nodes = bt.getNodes();
-	vec2D rkMat = bt.getrkMat();
-	std::vector< double > weights = bt.getWeights();
+	int stages = bt_.getStages();
+	std::vector< double > nodes = bt_.getNodes();
+	vec2D rkMat = bt_.getrkMat();
+	std::vector< double > weights = bt_.getWeights();
 
 	std::vector< double > xVec;
 
 	xVec = converters::pyListTodVec(pyxVec);
-	if (dxVec2D.size() == 0) {
-		dxVec2D.resize(xVec.size());
+	if (dxVec2D_.size() == 0) {
+		dxVec2D_.resize(xVec.size());
 	}
-	xVec2D.push_back(xVec);
-	tVec.push_back(t);
+	xVec2D_.push_back(xVec);
+	tVec_.push_back(t_);
 	initkVecTo0();
 
 	for (int k = 0; k < xVec.size(); k++) {
@@ -152,24 +152,24 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 		for (int i = 0; i < stages; i++) {
 			kSum = 0;
 			for (int j = 0; j <= i; j++) {
-				kSum += h*kVec[j]*rkMat[i][j];
+				kSum += h_*kVec_[j]*rkMat[i][j];
 			}
 
-			kVec[i] = py::extract<double>(func(t + nodes[i]*h, xVec[k]) + kSum);
+			kVec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k]) + kSum);
 		}
 
 		for (int i = 0; i < stages; i++) {
-			kFin += kVec[i] * weights[i];
+			kFin += kVec_[i] * weights[i];
 		}
-		dxVec2D[k].push_back(kFin);
+		dxVec2D_[k].push_back(kFin);
 
-		xVec[k] = xVec[k] + h*(kFin);
+		xVec[k] = xVec[k] + h_*(kFin);
 	}
 
-	t = t + h;
+	t_ = t_ + h_;
 
-	if (t >= tf)
-		finished = true;
+	if (t_ >= tf_)
+		finished_ = true;
 
 	return converters::vecToPyList(xVec);
 } // end RKIntegrator::step
@@ -179,7 +179,7 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 // isFinished
 /* ------------------------------------------------------------------------- */
 bool RKIntegrator::isFinished() {
-	return finished;
+	return finished_;
 }
 /* ------------------------------------------------------------------------- */
 
@@ -187,12 +187,12 @@ bool RKIntegrator::isFinished() {
 // Run
 /* ------------------------------------------------------------------------- */
 double RKIntegrator::run() {
-	for (int i = 0; i < steps; i++) {
-		xVec.push_back(x);
-		tVec.push_back(t);
-		x = step(x);
+	for (int i = 0; i < steps_; i++) {
+		xVec_.push_back(x_);
+		tVec_.push_back(t_);
+		x_ = step(x_);
 	}
-	return x;
+	return x_;
 }
 /* ------------------------------------------------------------------------- */
 
@@ -224,26 +224,26 @@ double RKIntegrator::run() {
 //}
 
 py::list RKIntegrator::get_xVec() {
-	return converters::vecToPyList(xVec);
+	return converters::vecToPyList(xVec_);
 }
 
 py::list RKIntegrator::get_dxVec() {
 //vDoub RKIntegrator::get_dxVec() {
-	return converters::vecToPyList(dxVec);
+	return converters::vecToPyList(dxVec_);
 }
 
 //vDoub RKIntegrator::get_tVec() {
 py::list RKIntegrator::get_tVec() {
-	return converters::vecToPyList(tVec);
+	return converters::vecToPyList(tVec_);
 }
 
 py::list RKIntegrator::get_xVec2D() {
-	return converters::vec2DToPyList(xVec2D);
+	return converters::vec2DToPyList(xVec2D_);
 }
 
 py::list RKIntegrator::get_dxVec2D() {
 //vDoub RKIntegrator::get_dxVec() {
-	return converters::vec2DToPyList(dxVec2D);
+	return converters::vec2DToPyList(dxVec2D_);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -255,11 +255,11 @@ py::list RKIntegrator::get_dxVec2D() {
 double RKIntegrator::get_last(int choice) {
 	switch (choice) {
 		case 0 :
-			return xVec.back();
+			return xVec_.back();
 		case 1 :
-			return dxVec.back();
+			return dxVec_.back();
 		case 2 :
-			return tVec.back();
+			return tVec_.back();
 		default:
 			throw;
 	}
@@ -269,11 +269,11 @@ double RKIntegrator::get_last(int choice) {
 py::list RKIntegrator::get_lastVec(int choice) {
 	switch (choice) {
 		case 0 :
-			return converters::vecToPyList(xVec2D.back());
+			return converters::vecToPyList(xVec2D_.back());
 		case 1 :
-			return converters::vecToPyList(dxVec2D.back());
+			return converters::vecToPyList(dxVec2D_.back());
 		case 2 :
-			return converters::vecToPyList(tVec);
+			return converters::vecToPyList(tVec_);
 		default:
 			return converters::vecToPyList(std::vector< double > {-500, -250, -100});
 	}

@@ -20,27 +20,27 @@ typedef std::vector< std::vector<double> > vec2D;
 
 class RKIntegrator {
 	private:
-		double t;
-		double tf;
-		double h;
-		double x;
-		int stages;
-		int steps;
-		bool finished;
-		bool usingVector;
-		std::vector< double > kVec;
-		py::object func;
+		double t_;
+		double tf_;
+		double h_;
+		double x_;
+		int stages_;
+		int steps_;
+		bool finished_;
+		bool usingVector_;
+		std::vector< double > kVec_;
+		py::object func_;
 
-		std::vector< double > xVec;
-		std::vector< double > dxVec;
+		std::vector< double > xVec_;
+		std::vector< double > dxVec_;
 
-		std::vector< std::vector< double > > xVec2D;
-		std::vector< std::vector< double > > dxVec2D;
+		std::vector< std::vector< double > > xVec2D_;
+		std::vector< std::vector< double > > dxVec2D_;
 
-		std::vector< double > tVec;
+		std::vector< double > tVec_;
 
 	public:
-		Tableau bt;
+		Tableau bt_;
 		/* ----------------------------------------------------------------- */
 		// Constructors
 		/* ----------------------------------------------------------------- */
