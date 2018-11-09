@@ -6,12 +6,16 @@ BOOST_PYTHON_MODULE(rk_ext)
 {
 	using namespace boost::python;
 	class_<std::vector<double> >("PyDVec")
-		.def(boost::python::vector_indexing_suite<std::vector<double> >());
+		.def(boost::python::vector_indexing_suite<std::vector<double> >())
+		.def(boost::python::vector_indexing_suite<std::vector< std::vector< double > > >());
 
 	class_<RKIntegrator>("RKIntegrator")
+		.def(init<object&, list&, double, double, double>())
 		.def(init<object&, list&, double, double, double, double>())
+		.def("step", &RKIntegrator::step)
 		.def("step", &RKIntegrator::stepWrap)
 		.def("step", &RKIntegrator::stepAugWrap)
+		.def("step", &RKIntegrator::vecStep)
 		.def("run", &RKIntegrator::run)
 		.def("isFinished", &RKIntegrator::isFinished)
 		.def("get_xVec", &RKIntegrator::get_xVec)
