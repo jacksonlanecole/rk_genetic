@@ -27,17 +27,17 @@ class RKIntegrator {
 		int stages_;
 		int steps_;
 		bool finished_;
-		bool usingVector_;
-		std::vector< double > kVec_;
+		bool using_vector_;
+		std::vector< double > k_vec_;
 		py::object func_;
 
-		std::vector< double > xVec_;
-		std::vector< double > dxVec_;
+		std::vector< double > x_vec_;
+		std::vector< double > dx_vec_;
 
 		std::vector< std::vector< double > > xVec2D_;
 		std::vector< std::vector< double > > dxVec2D_;
 
-		std::vector< double > tVec_;
+		std::vector< double > t_vec_;
 
 	public:
 		Tableau bt_;

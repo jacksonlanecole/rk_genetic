@@ -26,8 +26,8 @@ Tableau::Tableau(py::list& tableauArg) {
 } // end constructor taking a 2D vector tableau
 
 Tableau::Tableau(const Tableau& tableauArg) :
-	tableau(tableauArg.tableau) {
-	reset(tableau);
+	tableau_(tableauArg.tableau_) {
+	reset(tableau_);
 }
 
 Tableau::~Tableau() {};
@@ -54,22 +54,22 @@ void Tableau::reset(py::list& tableauArg) {
 // Tableau
 /* ------------------------------------------------------------------------- */
 void Tableau::setTableau(vec2D& btToSet) {
-	tableau.resize(btToSet.size());
-	tableau = btToSet;
+	tableau_.resize(btToSet.size());
+	tableau_ = btToSet;
 } // end setTableau
 
-void Tableau::setTableau(py::list& _tableau) {
-	int listLen = py::len(_tableau);
-	tableau.resize(listLen);
+void Tableau::setTableau(py::list& tableau) {
+	int listLen = py::len(tableau);
+	tableau_.resize(listLen);
 	for (int i = 0; i < listLen; i++) {
 		for (int j = 0; j < listLen; j++) {
-			tableau[i].push_back(py::extract<double>(_tableau[i][j]));
+			tableau_[i].push_back(py::extract<double>(tableau[i][j]));
 		}
 	}
 } // end setTableau
 
 vec2D Tableau::getTableau() {
-	return tableau;
+	return tableau_;
 } // end getTableau
 /* ------------------------------------------------------------------------- */
 
@@ -78,11 +78,11 @@ vec2D Tableau::getTableau() {
 // Stages
 /* ------------------------------------------------------------------------- */
 void Tableau::setStages() {
-	stages = tableau.size() - 1;
+	stages_ = tableau_.size() - 1;
 } // end setStages
 
 int Tableau::getStages() {
-	return stages;
+	return stages_;
 } // end getStages
 /* ------------------------------------------------------------------------- */
 
@@ -91,14 +91,14 @@ int Tableau::getStages() {
 // Nodes
 /* ------------------------------------------------------------------------- */
 void Tableau::setNodes() {
-	nodes.resize(stages);
-	for (int i=0; i < stages; i++) {
-		nodes[i] = tableau[i][0];
+	nodes_.resize(stages_);
+	for (int i=0; i < stages_; i++) {
+		nodes_[i] = tableau_[i][0];
 	}
 } // end setNodes
 
 vDoub Tableau::getNodes() {
-	return nodes;
+	return nodes_;
 } // end getNodes
 /* ------------------------------------------------------------------------- */
 
@@ -107,13 +107,13 @@ vDoub Tableau::getNodes() {
 // k Coefficients
 /* ------------------------------------------------------------------------- */
 void Tableau::setrkMat() {
-	for (int i = 0; i < stages; i++)
-		rkMat.push_back(std::vector<double>(tableau[i].begin() + 1, tableau[i].end()));
+	for (int i = 0; i < stages_; i++)
+		rk_mat_.push_back(std::vector<double>(tableau_[i].begin() + 1, tableau_[i].end()));
 } // end setrkMat
 
 
 vec2D Tableau::getrkMat() {
-	return rkMat;
+	return rk_mat_;
 } // end getrkMat
 /* ------------------------------------------------------------------------- */
 
@@ -122,12 +122,12 @@ vec2D Tableau::getrkMat() {
 // Weights
 /* ------------------------------------------------------------------------- */
 void Tableau::setWeights() {
-	for (int i = 1; i <= stages; i++) {
-		weights.push_back(tableau.back()[i]);
+	for (int i = 1; i <= stages_; i++) {
+		weights_.push_back(tableau_.back()[i]);
 	}
 } // end setWeights
 
 vDoub Tableau::getWeights() {
-	return weights;
+	return weights_;
 } // end getWeights
 /* ------------------------------------------------------------------------- */

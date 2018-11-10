@@ -21,7 +21,7 @@ RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
 	bt_.reset(btToSet);
 	initkVecTo0();
 
-	usingVector_ = false;
+	using_vector_ = false;
 
 } // end constructor
 
@@ -36,7 +36,7 @@ RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
 	bt_.reset(btToSet);
 	initkVecTo0();
 
-	usingVector_ = true;
+	using_vector_ = true;
 
 } // end constructor
 
@@ -68,9 +68,9 @@ double RKIntegrator::getTimeStep() {
 /* ------------------------------------------------------------------------- */
 void RKIntegrator::initkVecTo0() {
 	stages_ = bt_.getStages();
-	kVec_.resize(stages_);
+	k_vec_.resize(stages_);
 	for (int i = 0; i < stages_; i++)
-		kVec_[i] = 0.;
+		k_vec_[i] = 0.;
 } // end initKsTo0
 /* ------------------------------------------------------------------------- */
 
@@ -100,24 +100,24 @@ double RKIntegrator::step(double xVal) {
 	vec2D rkMat = bt_.getrkMat();
 	vDoub weights = bt_.getWeights();
 
-	xVec_.push_back(xVal);
-	tVec_.push_back(t_);
+	x_vec_.push_back(xVal);
+	t_vec_.push_back(t_);
 
 	initkVecTo0();
 
 	for (int i = 0; i < stages_; i++) {
 		kSum = 0;
 		for (int j = 0; j <= i; j++) {
-			kSum += h_*kVec_[j]*rkMat[i][j];
+			kSum += h_*k_vec_[j]*rkMat[i][j];
 		}
 
-		kVec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
+		k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
 	}
 
 	for (int i = 0; i < stages_; i++) {
-		kFin += kVec_[i] * weights[i];
+		kFin += k_vec_[i] * weights[i];
 	}
-	dxVec_.push_back(kFin);
+	dx_vec_.push_back(kFin);
 
 	xVal = xVal + h_*(kFin);
 	t_ = t_ + h_;
@@ -143,7 +143,7 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 		dxVec2D_.resize(xVec.size());
 	}
 	xVec2D_.push_back(xVec);
-	tVec_.push_back(t_);
+	t_vec_.push_back(t_);
 	initkVecTo0();
 
 	for (int k = 0; k < xVec.size(); k++) {
@@ -152,14 +152,14 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 		for (int i = 0; i < stages; i++) {
 			kSum = 0;
 			for (int j = 0; j <= i; j++) {
-				kSum += h_*kVec_[j]*rkMat[i][j];
+				kSum += h_*k_vec_[j]*rkMat[i][j];
 			}
 
-			kVec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k]) + kSum);
+			k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k]) + kSum);
 		}
 
 		for (int i = 0; i < stages; i++) {
-			kFin += kVec_[i] * weights[i];
+			kFin += k_vec_[i] * weights[i];
 		}
 		dxVec2D_[k].push_back(kFin);
 
@@ -179,6 +179,9 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 // isFinished
 /* ------------------------------------------------------------------------- */
 bool RKIntegrator::isFinished() {
+	/* Returns the finished_ boolean indicating that the integration has completed
+	 * base on the upper bound on time entered.
+	 */
 	return finished_;
 }
 /* ------------------------------------------------------------------------- */
@@ -187,9 +190,12 @@ bool RKIntegrator::isFinished() {
 // Run
 /* ------------------------------------------------------------------------- */
 double RKIntegrator::run() {
+	/* run does the full integration under the assumption that the variables do
+	 * not need to be modified.
+	 */
 	for (int i = 0; i < steps_; i++) {
-		xVec_.push_back(x_);
-		tVec_.push_back(t_);
+		x_vec_.push_back(x_);
+		t_vec_.push_back(t_);
 		x_ = step(x_);
 	}
 	return x_;
@@ -224,17 +230,17 @@ double RKIntegrator::run() {
 //}
 
 py::list RKIntegrator::get_xVec() {
-	return converters::vecToPyList(xVec_);
+	return converters::vecToPyList(x_vec_);
 }
 
 py::list RKIntegrator::get_dxVec() {
 //vDoub RKIntegrator::get_dxVec() {
-	return converters::vecToPyList(dxVec_);
+	return converters::vecToPyList(dx_vec_);
 }
 
 //vDoub RKIntegrator::get_tVec() {
 py::list RKIntegrator::get_tVec() {
-	return converters::vecToPyList(tVec_);
+	return converters::vecToPyList(t_vec_);
 }
 
 py::list RKIntegrator::get_xVec2D() {
@@ -253,13 +259,16 @@ py::list RKIntegrator::get_dxVec2D() {
 // Get lasts
 /* ------------------------------------------------------------------------- */
 double RKIntegrator::get_last(int choice) {
+	/* Returns either the last value of either the independent vector,
+	 * dependent vector, or the vector of derivatives
+	 */
 	switch (choice) {
 		case 0 :
-			return xVec_.back();
+			return x_vec_.back();
 		case 1 :
-			return dxVec_.back();
+			return dx_vec_.back();
 		case 2 :
-			return tVec_.back();
+			return t_vec_.back();
 		default:
 			throw;
 	}
@@ -267,13 +276,16 @@ double RKIntegrator::get_last(int choice) {
 
 
 py::list RKIntegrator::get_lastVec(int choice) {
+	/* Returns either the independent vector, dependent vector, or the
+	 * vector of derivatives
+	 */
 	switch (choice) {
 		case 0 :
 			return converters::vecToPyList(xVec2D_.back());
 		case 1 :
 			return converters::vecToPyList(dxVec2D_.back());
 		case 2 :
-			return converters::vecToPyList(tVec_);
+			return converters::vecToPyList(t_vec_);
 		default:
 			return converters::vecToPyList(std::vector< double > {-500, -250, -100});
 	}

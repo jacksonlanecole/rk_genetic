@@ -19,11 +19,11 @@ typedef std::vector< std::vector<double> > vec2D;
 
 class Tableau {
 	private:
-		vec2D tableau;
-		int stages;
-		vDoub weights;
-		vec2D rkMat;
-		vDoub nodes;
+		vec2D tableau_;
+		int stages_;
+		vDoub weights_;
+		vec2D rk_mat_;
+		vDoub nodes_;
 
 	public:
 		/* ----------------------------------------------------------------- */
