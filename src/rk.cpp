@@ -114,12 +114,10 @@ double RKIntegrator::step(double xVal) {
 		}
 
 		if (explicit_t_dependence_) {
-			std::cout << "Hello!" << std::endl;
 			k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
 		}
 		else {
-			std::cout << "Hello 2!" << std::endl;
-			k_vec_[i] = py::extract<double>(func_(0., xVal + kSum));
+			k_vec_[i] = py::extract<double>(func_(xVal + kSum));
 		}
 	}
 
@@ -168,7 +166,7 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 				k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k] + kSum));
 			}
 			else {
-				k_vec_[i] = py::extract<double>(func_(0., xVec[k] + kSum));
+				k_vec_[i] = py::extract<double>(func_(xVec[k] + kSum));
 			}
 		}
 
