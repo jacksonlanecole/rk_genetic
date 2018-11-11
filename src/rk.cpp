@@ -9,14 +9,15 @@ namespace py = boost::python;
 /* ------------------------------------------------------------------------- */
 RKIntegrator::RKIntegrator() {};
 
-RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
-		double steps, double ti, double tf, double xi) {
+RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet, double steps,
+	double ti, double tf, double xi, bool explicit_t_dependence) {
 	h_ = (tf - ti)/steps;
 	x_ = xi;
 	t_ = ti;
 	tf_ = tf;
 	steps_ = steps;
 	finished_ = false;
+	explicit_t_dependence_ = explicit_t_dependence;
 	func_ = f;
 	bt_.reset(btToSet);
 	initkVecTo0();
@@ -26,12 +27,13 @@ RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
 } // end constructor
 
 RKIntegrator::RKIntegrator(py::object& f, py::list& btToSet,
-		double steps, double ti, double tf) {
+		double steps, double ti, double tf, bool explicit_t_dependence) {
 	h_ = (tf - ti)/steps;
 	t_ = ti;
 	tf_ = tf;
 	steps_ = steps;
 	finished_ = false;
+	explicit_t_dependence_ = explicit_t_dependence;
 	func_ = f;
 	bt_.reset(btToSet);
 	initkVecTo0();
@@ -111,7 +113,14 @@ double RKIntegrator::step(double xVal) {
 			kSum += h_*k_vec_[j]*rkMat[i][j];
 		}
 
-		k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
+		if (explicit_t_dependence_) {
+			std::cout << "Hello!" << std::endl;
+			k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVal + kSum));
+		}
+		else {
+			std::cout << "Hello 2!" << std::endl;
+			k_vec_[i] = py::extract<double>(func_(0., xVal + kSum));
+		}
 	}
 
 	for (int i = 0; i < stages_; i++) {
@@ -155,7 +164,12 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 				kSum += h_*k_vec_[j]*rkMat[i][j];
 			}
 
-			k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k]) + kSum);
+			if (explicit_t_dependence_) {
+				k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k] + kSum));
+			}
+			else {
+				k_vec_[i] = py::extract<double>(func_(0., xVec[k] + kSum));
+			}
 		}
 
 		for (int i = 0; i < stages; i++) {

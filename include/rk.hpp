@@ -28,6 +28,7 @@ class RKIntegrator {
 		int steps_;
 		bool finished_;
 		bool using_vector_;
+		bool explicit_t_dependence_;
 		std::vector< double > k_vec_;
 		py::object func_;
 
@@ -47,10 +48,10 @@ class RKIntegrator {
 		RKIntegrator();
 		RKIntegrator(
 				py::object&, py::list&, double, double,
-				double, double);
+				double, double, bool);
 		RKIntegrator(
 				py::object&, py::list&, double, double,
-				double);
+				double, bool);
 		RKIntegrator(const RKIntegrator& rkArg);
 		~RKIntegrator();
 		/* ----------------------------------------------------------------- */
