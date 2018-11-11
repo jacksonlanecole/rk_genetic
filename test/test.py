@@ -11,7 +11,8 @@ def main():
     upperBound = 2
     initialValue = 1
 
-    RK4_1D = rk_ext.RKIntegrator(func, bt, 10000, lowerBound, upperBound, initialValue)
+    RK4_1D = rk_ext.RKIntegrator(func, bt, 10000, lowerBound, upperBound,
+            initialValue, True)
     #while (not RK4_1D.isFinished()):
     #    RK4_1D.step()
 
@@ -24,7 +25,7 @@ def main():
     lowerBound = 0.
     upperBound = 2.
     initialValue = [1., 1., 1., 1., 1.]
-    RK4_2D = rk_ext.RKIntegrator(func, bt, 10000., lowerBound, upperBound)
+    RK4_2D = rk_ext.RKIntegrator(func, bt, 10000., lowerBound, upperBound, False)
     x = initialValue
 
     while (not RK4_2D.isFinished()):
