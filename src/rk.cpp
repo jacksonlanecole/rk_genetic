@@ -163,10 +163,10 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 			}
 
 			if (explicit_t_dependence_) {
-				k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k] + kSum));
+				k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k] + kSum, i));
 			}
 			else {
-				k_vec_[i] = py::extract<double>(func_(xVec[k] + kSum));
+				k_vec_[i] = py::extract<double>(func_(xVec[k] + kSum, i));
 			}
 		}
 
