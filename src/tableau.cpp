@@ -97,7 +97,7 @@ void Tableau::setNodes() {
 	}
 } // end setNodes
 
-vDoub Tableau::getNodes() {
+vec1D Tableau::getNodes() {
 	return nodes_;
 } // end getNodes
 /* ------------------------------------------------------------------------- */
@@ -127,7 +127,7 @@ void Tableau::setWeights() {
 	}
 } // end setWeights
 
-vDoub Tableau::getWeights() {
+vec1D Tableau::getWeights() {
 	return weights_;
 } // end getWeights
 /* ------------------------------------------------------------------------- */

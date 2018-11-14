@@ -13,17 +13,17 @@ namespace py = boost::python;
 /* ------------------------------------------------------------------------- */
 // Type Definitions
 /* ------------------------------------------------------------------------- */
-typedef std::vector<double> vDoub;
-typedef std::vector< std::vector<double> > vec2D;
+typedef std::vector< double > vec1D;
+typedef std::vector< std::vector< double > > vec2D;
 /* ------------------------------------------------------------------------- */
 
 class Tableau {
 	private:
 		vec2D tableau_;
 		int stages_;
-		vDoub weights_;
+		vec1D weights_;
 		vec2D rk_mat_;
-		vDoub nodes_;
+		vec1D nodes_;
 
 	public:
 		/* ----------------------------------------------------------------- */
@@ -49,13 +49,13 @@ class Tableau {
 		int getStages();
 
 		void setNodes();
-		vDoub getNodes();
+		vec1D getNodes();
 
 		void setrkMat();
 		vec2D getrkMat();
 
 		void setWeights();
-		vDoub getWeights();
+		vec1D getWeights();
 };
 
 #endif
