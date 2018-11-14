@@ -14,6 +14,18 @@ then
 	display_usage
 else
 	sh scripts/run_cmake.sh $1
-	cp build/rk_ext.so test/.
-	cp build/rk_ext.so notebooks/.
+
+	if [[ ! -d lib ]]
+	then
+		mkdir -p lib
+	fi
+
+	cp build/rk_ext.so lib/.
+	cp lib/rk_ext.so test/.
+	cp lib/rk_ext.so src/python/nbody/.
+
+	if [[ ! -d notebooks/nbody ]]
+	then
+		ln -s src/python/nbody notebooks/.
+	fi
 fi
