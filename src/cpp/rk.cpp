@@ -98,9 +98,9 @@ double RKIntegrator::step(double xVal) {
 	double kSum;
 	double kFin = 0.;
 	//int stages_ = bt_.getStages();
-	vDoub nodes = bt_.getNodes();
+	vec1D nodes = bt_.getNodes();
 	vec2D rkMat = bt_.getrkMat();
-	vDoub weights = bt_.getWeights();
+	vec1D weights = bt_.getWeights();
 
 	x_vec_.push_back(xVal);
 	t_vec_.push_back(t_);
@@ -136,16 +136,13 @@ double RKIntegrator::step(double xVal) {
 
 //std::vector< double > RKIntegrator::vecStep(py::list& pyxVec) {
 py::list RKIntegrator::vecStep(py::list& pyxVec) {
-	double kSum;
-	double kFin = 0.;
 	int stages = bt_.getStages();
 	std::vector< double > nodes = bt_.getNodes();
 	vec2D rkMat = bt_.getrkMat();
 	std::vector< double > weights = bt_.getWeights();
 
-	std::vector< double > xVec;
+	std::vector< double > xVec = converters::pyListTodVec(pyxVec);
 
-	xVec = converters::pyListTodVec(pyxVec);
 	if (dxVec2D_.size() == 0) {
 		dxVec2D_.resize(xVec.size());
 	}
@@ -153,11 +150,15 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 	t_vec_.push_back(t_);
 	initkVecTo0();
 
+	#pragma omp parallel for
+	//std::cout << " +++++++++++++++++++++++++++++++++++++++++++++++++++ " << std::endl;
 	for (int k = 0; k < xVec.size(); k++) {
+	//std::cout << " --------------------------- " << std::endl;
 		initkVecTo0();
-		kFin = 0.;
+		double kFin = 0.;
+		//std::cout << "xVec[" << k << "] = " << xVec[k] << std::endl;
 		for (int i = 0; i < stages; i++) {
-			kSum = 0;
+			double kSum = 0;
 			for (int j = 0; j <= i; j++) {
 				kSum += h_*k_vec_[j]*rkMat[i][j];
 			}
@@ -166,9 +167,13 @@ py::list RKIntegrator::vecStep(py::list& pyxVec) {
 				k_vec_[i] = py::extract<double>(func_(t_ + nodes[i]*h_, xVec[k] + kSum, k));
 			}
 			else {
+				//std::cout << "kSum = " << kSum << std::endl;
 				k_vec_[i] = py::extract<double>(func_(xVec[k] + kSum, k));
 			}
 		}
+		//std::cout << "func(xVec[" << k << "], " << k <<  ") = ";
+		//double temp_dub = py::extract<double>(func_(xVec[k] + kSum, k));
+		//std::cout << temp_dub << std::endl;
 
 		for (int i = 0; i < stages; i++) {
 			kFin += k_vec_[i] * weights[i];
