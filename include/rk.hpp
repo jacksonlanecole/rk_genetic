@@ -14,8 +14,8 @@ namespace py = boost::python;
 /* ------------------------------------------------------------------------- */
 // Type Definitions
 /* ------------------------------------------------------------------------- */
-typedef std::vector<double> vDoub;
-typedef std::vector< std::vector<double> > vec2D;
+typedef std::vector< double > vec1D;
+typedef std::vector< std::vector< double > > vec2D;
 /* ------------------------------------------------------------------------- */
 
 class RKIntegrator {
@@ -29,16 +29,16 @@ class RKIntegrator {
 		bool finished_;
 		bool using_vector_;
 		bool explicit_t_dependence_;
-		std::vector< double > k_vec_;
+		vec1D k_vec_;
 		py::object func_;
 
-		std::vector< double > x_vec_;
-		std::vector< double > dx_vec_;
+		vec1D x_vec_;
+		vec1D dx_vec_;
 
-		std::vector< std::vector< double > > xVec2D_;
-		std::vector< std::vector< double > > dxVec2D_;
+		vec2D xVec2D_;
+		vec2D dxVec2D_;
 
-		std::vector< double > t_vec_;
+		vec1D t_vec_;
 
 	public:
 		Tableau bt_;
