@@ -30,7 +30,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@echo "$(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 docs: $(TEXSRCS)
-	@latexmk -pdf -use-make -pdflatex="pdflatex -interaction=nonstopmode" \
+	@latexmk -pdf -use-make- -pdflatex="pdflatex -interaction=nonstopmode" \
 		     -outdir=build -cd $(TEXSRCS)
 	@make movepdfs
 	@$(RM) $(TEXBUILDDIRS)
