@@ -22,10 +22,10 @@ else
 
 	cp build/rk_ext.so lib/.
 	cp lib/rk_ext.so test/.
-	cp lib/rk_ext.so src/python/nbody/.
+	cp lib/rk_ext.so python/nbody/.
 
-	if [[ ! -d notebooks/nbody ]]
+	if [[ ! -L notebooks/nbody ]]
 	then
-		ln -s src/python/nbody notebooks/.
+		ln -s python/nbody notebooks/nbody
 	fi
 fi
