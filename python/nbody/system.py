@@ -31,7 +31,7 @@ class System:
         self.iterator = 0
         self.multi = False
         self.printer = False
-        self.consts = {'G':6.67408e-11}
+        self.consts = {'G':(6.67408e-11)*(3600**2)}
         self.body_list = body_list
         self.num_bodies = len(body_list)
         self.masses = [body.mass for body in self.body_list]
@@ -48,6 +48,9 @@ class System:
         self.acceleration_coeffs = self.set_acceleration_coeffs()
 
         self.energy = [self.get_energy()]
+        self.energy_change = {}
+        self.energy_change['absolute'] = None
+        self.energy_change['percentage'] = None
 
         self.data = {
             'vx':[[v] for v in self.x_velocities],
@@ -58,6 +61,11 @@ class System:
             'z':[[p] for p in self.z_positions],
             'ac':[[ac] for ac in self.acceleration_coeffs],
         }
+
+    def update_energy_change(self):
+        self.energy_change['absolute'] = self.energy[-1] - self.energy[0]
+        self.energy_change['percentage'] = \
+                (self.energy[-1] - self.energy[0])/abs(self.energy[0])*100
 
     def setup_integrators(self, tableau, t_init, t_fin, steps):
         self.stepsize = (t_fin - t_init)/steps
@@ -139,6 +147,7 @@ class System:
             self.acceleration_coeffs = self.set_acceleration_coeffs()
             self.update_data()
             self.energy.append(self.get_energy())
+            self.update_energy_change()
 
             #if self.multi: #    vx = mp.Process(
             #        target=self.update_velocities,
