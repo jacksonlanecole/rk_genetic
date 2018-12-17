@@ -9,6 +9,7 @@
 %}
 \usepackage{subcaption}
 \usepackage{import}
+\usepackage{appendix}
 \usepackage{setspace}
 \usepackage[printwatermark]{xwatermark}
 %\newwatermark[allpages,color=red!10,angle=90,scale=3.75,xpos=60,ypos=0]
@@ -160,7 +161,7 @@ citecolor=blue]{hyperref}
 %\setcounter{secnumdepth}{1}
 
 
-\title{Honors Contract\\
+\title{Honors Report\\
 %\phantom{\_}\\
 \large \theWorkingTitle\thanks{\url{https://github.com/jacksonlanecole/rkev}}}
 \author{Jackson L. Cole}
@@ -217,6 +218,12 @@ and the time is naturally updated by
     \label{eqn: time update}
     t = t_i + h.
 \end{equation}
+Eventually, from the given function which we assume to be the derivative of some
+function of interest, the Runge-Kutta will approximate the real value of the
+function of interest at some parameter. For this reason, we tend to call these
+methods \say{integrators}, as they find a value for the real function of
+interest when all we know is the derivative.
+
 However, while the choice of the bolded leading coefficient seems to come
 from a desire to
 appropriately average the derivatives, \citet{holmes_2018} points out that
@@ -242,11 +249,11 @@ coefficients, and the weights of the derivatives in the bottom line of equation
 as the Butcher Tableau describing the scheme of the RK4. This is shown in Figure
 \ref{fig: full rk4 butcher}. Because this is clearly just a lower triangular
 matrix, we can more simply express it as in Figure \ref{fig: RK4 butcher tableau}.
-It should be noted that explicit Runge-Kutta routines have the requirement that
-its associated Butcher Tableau is strictly lower diagonal, as this removes
+It should be noted that explicit Runge-Kutta routines have the requirement
+that their associated Butcher Tableau is strictly lower diagonal, as this removes
 the possibility of
 needing to solve implicit equations while calculating successive derivatives.
-Further, a sample C++ snippet has been given for running a an RK4 routine as
+Further, a sample C++ snippet has been given for running an RK4 routine as
 shown below in listing \ref{listing_RK4}.
 
 \begin{figure}[h!]
@@ -315,10 +322,10 @@ question as the total energy is \textit{not} conserved over long time
 integrations. \cite{holmes_2018}
 
 When modeling physical systems, a common method of of preserving conserved
-quantities is to use a class of integrators known as \textit{symplectic}
-integrators. While the scope of this project does not necessarily extend
+quantities is to use \textit{symplectic} integrators.
+While the scope of this project does not necessarily extend
 to symplectic integrators outside of the possible implementation of one for
-comparison of the validity of this method, they should recieve some discussion.
+comparison of the validity of this method, they should receive some discussion.
 In general, many physical systems can be described in the Hamiltonian
 formulation of mechanics; this is a far more flexible approach to mechanics than
 is Newtonian or even Lagrangian formulation, especially in terms of the
@@ -364,7 +371,7 @@ Without derivation, the equations of motion can be expressed as
 
 Using these equations of motion, integration schemes can be defined that
 iteratively solve the system on a symplectic manifold on which the system
-is defined in the first place, which means that quanities that are conserved in
+is defined in the first place, which means that quantities that are conserved in
 the physical system will also be conserved in the iterative solution.
 
 %\subsection{Important Note}
@@ -457,6 +464,18 @@ therefore, only explicit Runge-Kutta schemes can be used.
 
 
 \subsection{\texttt{nbody} package}
+In astronomy and astrophysics, a problem that arises in nearly every discussion
+of celestial mechanics is simply known as the $n$-body problem. When two bodies
+are in orbit around a common center of mass, their orbits can be described by
+purely analytical functions. In other words, the motions of two orbiting
+bodies have solutions that can simply be written down on paper. In the case of
+systems of $n$-bodies where $n\gg2$, the solutions describing the motions of the
+bodies can be approximated by cloud approaches, where each particle or star is
+not analyzed individually. However, in cases where the number of bodies is
+greater than two, but less than that which could be approximated by cloud
+physics, an analytical solution to the $n$-body problem does not exist, and
+therefore, the problem must be solved by numerical methods alone.
+
 The initial motivation for this project was the inherent loss of energy that
 occurs when iteratively solving the $n$-body problem without using a symplectic
 integrator. For this reason, the method by which the general Runge-Kutta
@@ -496,8 +515,9 @@ package is very simple, and requires that the user define a few bodies,
 instantiate the system using a list of these bodies, and then define the
 time bounds and step size to set up the RK integrators for $x$, $y$, and $z$
 positions and velocities. Then the user just has to use the run method provided
-to solve the system. A sample of the usage of these methods is given in Appendix
-\ref{app:jupyter}.
+to solve the system.
+%A sample of the usage of these methods is given in Appendix
+%\ref{app:jupyter}.
 
 While this is now working, the results still reflect the lack of correction for
 energy loss that occurs as a result of our method of integration. Basically, the
@@ -522,8 +542,8 @@ The next steps are described in~\ref{sec:future}.
 
 
 \section{Future work}\label{sec:future}
-\subsection{Evolutionary algorithm to optimize $s$-stage Butcher Tableau using
-    DEAP\cite{DEAP}}
+\subsection{Evolutionary algorithm to optimize variable stage Butcher Tableau using
+    DEAP}
 
 If the $n$-body simulation is carried out without any correction, the orbits
 quickly decay due to energy loss. This can be seen in a simple model of the
@@ -547,7 +567,7 @@ individuals using user-defined data types, which is helpful for quickly
 generating a solution for evolving the tableaus.
 
 Further, a common problem with evolutionary techniques and techniques in machine
-learning is that while they work excpetionally well in many cases, they can
+learning is that while they work exceptionally well in many cases, they can
 quickly become an intellectually unsatisfying black-box. The hope is that using
 a dedicated evolutionary algorithm framework will allow some degree of
 transparency into the actual optimization process.
@@ -638,18 +658,20 @@ The repository for the DEAP project can be found at
 %to remedy the issue with the Runge-Kutta routine, I can begin working on
 %implementing a symplectic integrator for comparison and then wrapping the
 %generic Runge-Kutta routine for interfacing with Python.
+
+\clearpage
+\bibliography{final}
+
 \begin{appendices}
     \section{Resources and specifications}
     The repository for this project can be found at
     \url{https://github.com/jacksonlanecole/rkev}. There is a detailed README
     located here that describes how the software is built and run.
 
-    \section{Jupyter notebook showing interaction with software}\label{app:jupyter}
-    \includepdf[pages=-]{content/rkevtesting.pdf}
+    \section{rkev Jupyter Notebook (2018-12-14 15:50)}\label{app:jupyter}
+    \includepdf[pages=-]{content/rkev.pdf}
 \end{appendices}
 
-\clearpage
-\bibliography{final}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\partAsChapter{Time Schedule}
