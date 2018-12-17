@@ -24,7 +24,7 @@ RM = rm -rf
 all:
 
 docs: $(TEXSRCS)
-	@latexmk -pdf -use-make- -pdflatex="pdflatex -interaction=nonstopmode" \
+	@latexmk -f -pdf -use-make- -pdflatex="pdflatex -interaction=nonstopmode" \
 		     -outdir=build -cd $(TEXSRCS)
 	@make movepdfs
 	@$(RM) $(TEXBUILDDIRS)
