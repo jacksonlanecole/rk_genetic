@@ -14,7 +14,7 @@ OBJECTS  := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 INC      := -I include
 
 DOCSDIR := docs
-TEXSRCS := $(shell find $(DOCSDIR) -type f -name \*.tex)
+TEXSRCS := $(shell find $(DOCSDIR) -maxdepth 2 -type f -name \*.tex)
 TEXBUILDDIRS = $(shell find $(DOCSDIR) -type d -name build)
 PDFDOCS = $(shell find $(TEXBUILDDIRS) -type f -name \*.pdf)
 PDFDOCSDIR := docs/pdf
@@ -24,10 +24,16 @@ RM = rm -rf
 all:
 
 docs: $(TEXSRCS)
-	@latexmk -f -pdf -use-make- -pdflatex="pdflatex -interaction=nonstopmode" \
+	@latexmk -pdf -use-make- -pdflatex="pdflatex -interaction=nonstopmode" \
 		     -outdir=build -cd $(TEXSRCS)
 	@make movepdfs
-	@$(RM) $(TEXBUILDDIRS)
+	#@$(RM) $(TEXBUILDDIRS)
+
+presentation: docs/final/rkev_presentation-jackson_cole.tex
+	@latexmk -pdf -use-make- -pdflatex="pdflatex"\
+		-outdir=build -cd $<
+	@make movepdfs
+
 
 movepdfs: $(PDFDOCS)
 	@mkdir -p $(PDFDOCSDIR)
