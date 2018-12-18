@@ -203,15 +203,15 @@ kderivatives}.
 \begin{equation}
 \begin{aligned}
     k_1 &= \functionof{f}{t_i,\, x_i}\\
-    k_2 &= \functionof{f}{t_i + \dfrac{1}{2}h,\, x_i + \dfrac{1}{2}k_1}\\
-    k_3 &= \functionof{f}{t_i + \dfrac{1}{2}h,\, x_i + \dfrac{1}{2}k_2}\\
+    k_2 &= \functionof{f}{t_i + \frac{1}{2}h,\, x_i + \frac{1}{2}k_1}\\
+    k_3 &= \functionof{f}{t_i + \frac{1}{2}h,\, x_i + \frac{1}{2}k_2}\\
     k_4 &= \functionof{f}{       t_i + h,\,        x_i + k_3}\\
     \label{eqn: kderivatives}
 \end{aligned}
 \end{equation}
 The solution is updated
 \begin{equation}
-    x   = x_i + \mathbf{\dfrac{1}{6}}\paren{k_1 + 2k_2 + 2k_3 + k_4}h
+    x   = x_i + \mathbf{\frac{1}{6}}\paren{k_1 + 2k_2 + 2k_3 + k_4}h
 \end{equation}
 and the time is naturally updated by
 \begin{equation}
