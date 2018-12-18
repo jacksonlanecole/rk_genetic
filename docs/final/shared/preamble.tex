@@ -1,0 +1,99 @@
+\usepackage[
+% school,
+% simplified
+]{pgf-umlcd}
+\renewcommand{\umltextcolor}{black}
+\renewcommand{\umlfillcolor}{gray!40}
+\renewcommand{\umldrawcolor}{black}
+
+\usepackage[
+    numbers,
+    round,
+]{natbib}
+\bibliographystyle{plainnat}
+
+\newcommand{\myworries}[1]{%
+    \begin{mdframed}[style=mystyle]
+        \singlespacing\fontsize{8}{10}\selectfont
+        #1
+    \end{mdframed}
+}
+
+\usepackage{listings}
+\lstset{%
+    frame=tb,
+    language=python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    %keywordstyle=\color{blue},
+    %commentstyle=\color{dkgreen},
+    %stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4
+}
+\usepackage{fancyvrb}
+\usepackage{dirtree}
+
+% --------------------------------------------------------------------------- %
+% TIKZ STUFF
+% --------------------------------------------------------------------------- %
+\usepackage{tikz}
+\usetikzlibrary{%
+    shapes,
+    arrows,
+    decorations.markings,
+    positioning,
+}
+\tikzstyle{line}=[draw]
+
+% Define block styles
+% --------------------------------------------------------------------------- %
+\tikzset{%
+    startstop/.style ={%
+        rectangle,
+        rounded corners,
+        minimum width=2cm,
+        minimum height=1cm,
+        text centered,
+        thick,
+        draw,
+    },
+    io/.style = {%
+        trapezium,
+        trapezium left angle=70,
+        trapezium right angle=110,
+        text width=2cm,
+        minimum height=1cm,
+        align=center,
+        thick,
+        draw,
+    },
+    process/.style = {%
+        rectangle,
+        text width=5cm,
+        minimum height=1cm,
+        align=center,
+        thick,
+        draw,
+    },
+    decision/.style = {%
+        diamond,
+        text width=5cm,
+        minimum height=1cm,
+        align=center,
+        thick,
+        draw,
+    },
+}
+\tikzstyle{arrow} = [
+    thick,
+    ->,
+    >=stealth
+]
+% --------------------------------------------------------------------------- %
